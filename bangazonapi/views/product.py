@@ -22,6 +22,12 @@ class ProductSerializer(serializers.ModelSerializer):
                   'average_rating', 'can_be_rated', )
         depth = 1
 
+class LikesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Customer
+        fields = ['likes']
+        depth = 1
+
 
 class Products(ViewSet):
     """Request handlers for Products in the Bangazon Platform"""
@@ -291,5 +297,34 @@ class Products(ViewSet):
             rec.save()
 
             return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+        return Response(None, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    @action(methods=['post','delete'], detail=True)
+    def like(self, request, pk=None):
+        """Like a product"""
+
+        customer = Customer.objects.get(user=request.auth.user)
+        product = Product.objects.get(pk=pk)
+
+        if request.method == "POST":
+            customer.likes.add(product)
+            return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+        if request.method =="DELETE":
+            customer.likes.remove(product)
+            return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+
+        return Response(None, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    @action(methods=['get'], detail=False)
+    def liked(self, request):
+        """List products a customer has liked"""
+
+        if request.method == "GET":
+            customer = Customer.objects.get(user=request.auth.user)
+            serializer = LikesSerializer(customer, context={'request': request})
+            return Response(serializer.data)
 
         return Response(None, status=status.HTTP_405_METHOD_NOT_ALLOWED)
