@@ -291,7 +291,7 @@ class Products(ViewSet):
             products = products.filter(price__gte=min_price)
 
         if location is not None:
-            products = products.filter(location__contains=location)
+            products = products.filter(location__icontains=location)
 
         serializer = ProductSerializer(
             products, many=True, context={'request': request})
