@@ -372,6 +372,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     """
     user = UserSerializer(many=False)
     recommends = RecommenderSerializer(many=True)
+    recommended = RecommenderSerializer(many=True)
 
     class Meta:
         model = Customer
