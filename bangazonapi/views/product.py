@@ -1,4 +1,5 @@
 """View module for handling requests about products"""
+from django.core.exceptions import ValidationError
 from rest_framework.decorators import action
 from bangazonapi.models.recommendation import Recommendation
 import base64
@@ -110,7 +111,11 @@ class Products(ViewSet):
 
             new_product.image_path = data
 
-        new_product.save()
+        new_product.clean_fields(exclude="image_path")
+        try:
+            new_product.save()
+        except ValidationError as ex:
+            return Response(ex)
 
         serializer = ProductSerializer(
             new_product, context={'request': request})
