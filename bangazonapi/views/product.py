@@ -1,4 +1,5 @@
 """View module for handling requests about products"""
+from bangazonapi.models.rating import Rating
 from django.core.exceptions import ValidationError
 from rest_framework.decorators import action
 from bangazonapi.models.recommendation import Recommendation
@@ -343,3 +344,22 @@ class Products(ViewSet):
             return Response(serializer.data)
 
         return Response(None, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    @action(methods=['post'], detail=True)
+    def rate(self, request, pk=None):
+        """Add a rating to a product"""
+        customer = Customer.objects.get(user=request.auth.user)
+        product = Product.objects.get(pk=pk)
+        score = request.data["score"]
+
+        rating = Rating()
+        rating.customer = customer
+        rating.product = product
+        rating.score = int(score)
+
+        try:
+            rating.clean_fields()
+            rating.save()
+            return Response(None, status=status.HTTP_204_NO_CONTENT)
+        except Exception as ex:
+            return Response (ex.args[0], status=status.HTTP_400_BAD_REQUEST)
