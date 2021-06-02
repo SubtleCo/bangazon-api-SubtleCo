@@ -123,3 +123,23 @@ class OrderTests(APITestCase):
 
 
     # TODO: New line item is not added to closed order
+    def test_nothing_added_to_closed_order(self):
+
+        # Create an Order with a product and close it
+        self.test_complete_order()
+
+        # Create a new order with a product
+        url = "/cart"
+        data = { "product_id": 1 }
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
+        self.client.post(url, data, format='json')
+
+        # Check that there is only one item in order 1
+        response = self.client.get("/orders/1")
+        json_response = json.loads(response.content)
+        self.assertEqual(len(json_response["lineitems"]), 1)
+
+        # Check that there is only one item in order 2
+        response = self.client.get("/orders/2")
+        json_response = json.loads(response.content)
+        self.assertEqual(len(json_response["lineitems"]), 1)
