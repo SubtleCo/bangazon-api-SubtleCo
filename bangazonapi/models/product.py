@@ -5,7 +5,7 @@ from safedelete.models import SOFT_DELETE
 from .customer import Customer
 from .productcategory import ProductCategory
 from .orderproduct import OrderProduct
-from .productrating import ProductRating
+from .rating import Rating
 
 
 class Product(SafeDeleteModel):
@@ -57,10 +57,10 @@ class Product(SafeDeleteModel):
         Returns:
             number -- The average rating for the product
         """
-        ratings = ProductRating.objects.filter(product=self)
+        ratings = Rating.objects.filter(product=self)
         total_rating = 0
         for rating in ratings:
-            total_rating += rating.rating
+            total_rating += rating.score
 
         try:
             avg = total_rating / len(ratings)
