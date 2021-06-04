@@ -1,5 +1,10 @@
 # Bangazon Platform API - An Exercise from Nashville Software School
+
 Welcome to Bangazon! This was the final solo assignment I completed while at Nashville Software School.
+
+The purpose of this project was to become more comfortable with integrated automated testing in Python, generating HTML responses in Django, and squishin' bugs in both Python and Django.
+
+This is a forked copy of my work. Instructions from the project are below!
 
 
 ## Prerequisites / Setup
