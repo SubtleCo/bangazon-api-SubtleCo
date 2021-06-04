@@ -1,19 +1,13 @@
-# Bangazon Platform API
+# Bangazon Platform API - An Exercise from Nashville Software School
+Welcome to Bangazon! This was the final solo assignment I completed while at Nashville Software School.
 
-## Prerequisites
+
+## Prerequisites / Setup
 
 ### Mac OS
 
 ```sh
 brew install libtiff libjpeg webp little-cms2
-```
-
-### Linux (WSL)
-
-```sh
-sudo apt-get install libtiff5-dev libjpeg8-dev libopenjp2-7-dev zlib1g-dev \
-    libfreetype6-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev python3-tk \
-    libharfbuzz-dev libfribidi-dev libxcb1-dev
 ```
 
 ### Install apidoc
