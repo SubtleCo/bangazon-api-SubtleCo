@@ -1,3 +1,6 @@
+from bangazonapi.models.order import Order
+from bangazonapi.models.customer import Customer
+from bangazonapi.models.payment import Payment
 import json
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -79,6 +82,64 @@ class OrderTests(APITestCase):
         self.assertEqual(json_response["size"], 0)
         self.assertEqual(len(json_response["lineitems"]), 0)
 
-    # TODO: Complete order by adding payment type
+
+    def test_complete_order(self):
+        """
+        Ensure we can complete an order by adding a payment type
+        """
+        # Add a payment type to the DB
+        customer = Customer.objects.get(pk=1)
+        payment = Payment()
+        payment.merchant_name = "Amex"
+        payment.account_number = "1234567890"
+        payment.customer = customer
+        payment.expiration_date = "2023-12-12"
+        payment.create_date = "2020-12-12"
+
+        payment.save()
+
+        # Create an order
+        self.test_add_product_to_order()
+        order = Order.objects.get(pk=1)
+        url = "/orders/1"
+
+        # Check that the order is open
+        response = self.client.get(url)
+        json_response = json.loads(response.content)
+        self.assertEqual(json_response["payment_type"], None)
+
+        # Complete the order
+        data = {
+            "payment_type": 1
+        }
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # Check that the order has a payment type
+        response = self.client.get(url)
+        json_response = json.loads(response.content)
+
+        self.assertNotEqual(json_response["payment_type"], None)
+
 
     # TODO: New line item is not added to closed order
+    def test_nothing_added_to_closed_order(self):
+
+        # Create an Order with a product and close it
+        self.test_complete_order()
+
+        # Create a new order with a product
+        url = "/cart"
+        data = { "product_id": 1 }
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
+        self.client.post(url, data, format='json')
+
+        # Check that there is only one item in order 1
+        response = self.client.get("/orders/1")
+        json_response = json.loads(response.content)
+        self.assertEqual(len(json_response["lineitems"]), 1)
+
+        # Check that there is only one item in order 2
+        response = self.client.get("/orders/2")
+        json_response = json.loads(response.content)
+        self.assertEqual(len(json_response["lineitems"]), 1)
